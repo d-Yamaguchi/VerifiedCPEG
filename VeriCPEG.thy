@@ -64,7 +64,9 @@ Each input cpegExp for paring must be a well-formed expression.
 How to describe this conditioning in the type of parsing?
 *)
 
-fun parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> string)" where
+fun parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> string)"
+  and evalCapturedSubterm :: "(nodeExp list) \<Rightarrow> string \<Rightarrow> ((string\<times>tree) list \<times> string) option"
+  where
   "parsing empty xs = (simbols [],xs)"
 | "parsing (terminal a) (x#xs) = (if a = x then (simbols ''a'',xs) else (fail, (x#xs)))"
 | "parsing (nonterm e) xs =  parsing e xs"
@@ -90,16 +92,15 @@ fun parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> str
                         | (simbols x, ys) \<Rightarrow> (case ty of
                                                bString \<Rightarrow> (ast (baseValString x), ys)
                                              | bInt    \<Rightarrow> (ast (baseValInt 1), ys)
-                                             | bBool   \<Rightarrow> (ast (baseValBool true), ys)
+                                             | bBool   \<Rightarrow> (ast (baseValBool True), ys)
                                              )
                         )"
                         (* if e is a well-formed expression it will not derive a value ast (TODO: SHOW IT!) *)
- | "parsing (capture l xis) xs = (case evalCapturedSubterm xis xs of
+| "parsing (capture l xis) xs = (case evalCapturedSubterm xis xs of
                                   None \<Rightarrow> (fail, xs)
                                 | Some (subtrees, ys) \<Rightarrow> (ast (nodeVal l subtrees),ys)
                                 )"
-and evalCapturedSubterm :: "(nodeExp list) \<Rightarrow> string \<Rightarrow> ((string\<times>tree) list \<times> string) option" where
-  "evalCapturedSubterm [] xs = Some ([], xs)"
+| "evalCapturedSubterm [] xs = Some ([], xs)"
 | "evalCapturedSubterm (e#es) xs = (case e of
                                      subtree \<nu> eSub \<Rightarrow> (case parsing eSub xs of
                                                           (fail, _) \<Rightarrow> None
