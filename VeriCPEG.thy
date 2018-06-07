@@ -56,7 +56,6 @@ datatype outputP =
   fail                                                 
   | simbols string
   | ast tree
-(*| none   *)
 
 (* parsing function*)
 (*
@@ -64,11 +63,21 @@ Each input cpegExp for paring must be a well-formed expression.
 How to describe this conditioning in the type of parsing?
 *)
 
+type_synonym subtrees = "(string\<times>tree) list"
+
+fun leftAssocTreeConstructor :: "string \<Rightarrow> tree \<Rightarrow> string \<Rightarrow> (subtrees list) \<Rightarrow> tree"
+  where
+  "leftAssocTreeConstructor nu0 d0 l (theta1#[]) = nodeVal l ((nu0,d0)#theta1)"
+| "leftAssocTreeConstructor nu0 d0 l (thetaTl#theta) = nodeVal l ((nu0,leftAssocTreeConstructor nu0 d0 l theta)#thetaTl)"
+| "leftAssocTreeConstructor nu0 d0 l [] = baseValString ''null Subtrees Theta was given''"
+
 fun parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> string)"
-  and evalCapturedSubterm :: "(nodeExp list) \<Rightarrow> string \<Rightarrow> ((string\<times>tree) list \<times> string) option"
+  and evalCapturedSubterm :: "(nodeExp list) \<Rightarrow> string \<Rightarrow> (subtrees \<times> string) option"
+  and greedyRsTreeGene :: "nodeExp list \<Rightarrow> ((subtrees list) \<times> string) \<Rightarrow> ((subtrees list) \<times> string)"
   where
   "parsing empty xs = (simbols [],xs)"
 | "parsing (terminal a) (x#xs) = (if a = x then (simbols ''a'',xs) else (fail, (x#xs)))"
+| "parsing (terminal _) [] = (fail, [])"
 | "parsing (nonterm e) xs =  parsing e xs"
 | "parsing (seq e1 e2) xs = (case parsing e1 xs of
                              (fail,_) \<Rightarrow> (fail,xs)
@@ -86,6 +95,13 @@ fun parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> str
 | "parsing (not e) xs = (case parsing e xs of
                           (fail,_) \<Rightarrow> (simbols [],xs)
                         | (_, _) \<Rightarrow> (fail, xs)
+                        )"
+| "parsing (rep e) xs = (case parsing e xs of
+                          (fail, _) \<Rightarrow> (simbols [],xs)
+                        | (simbols x, ys) \<Rightarrow> (case parsing (rep e) ys of
+                                               (fail, _) \<Rightarrow> (simbols x, ys)
+                                             | (simbols y, zs) \<Rightarrow> (simbols (x@y), zs)
+                                             )
                         )"
 | "parsing (leaf ty e) xs = (case parsing e xs of
                           (fail, _) \<Rightarrow> (fail, xs)
@@ -114,4 +130,16 @@ fun parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> str
                                                      | (simbols x, ys) \<Rightarrow> Some ([],ys)
                                                     )
                                    )"
+  (* \<nu>0: string, e0: cpegExp,  L: string, [\<xi>]: nodeExp list *)
+| "parsing (foldCap nu0 e0 l xis) xs = (case parsing e0 xs of
+                                              (fail, _) \<Rightarrow> (fail, xs)  (* E-Leftfolding2 *)
+                                            | (ast d, ys) \<Rightarrow> (case evalCapturedSubterm xis ys of
+                                                              None \<Rightarrow> (ast d, ys) (* E-Leftfolding3 *)
+                                                            | Some (dyss, zs) \<Rightarrow> (\<lambda> (\<Theta>,zt). (ast (leftAssocTreeConstructor nu0 d l \<Theta>) , zt) ) (greedyRsTreeGene xis ([dyss],zs))
+                                                             )
+                                            )"
+| "greedyRsTreeGene xis (theta,xs) = (case evalCapturedSubterm xis xs of
+                                              None \<Rightarrow> (theta,xs)
+                                            | Some (thetaHd,ys) \<Rightarrow> greedyRsTreeGene xis ((thetaHd#theta),ys)
+                                            )"
 end
