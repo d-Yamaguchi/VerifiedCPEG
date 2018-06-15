@@ -37,9 +37,11 @@ inductive kined ("_ \<turnstile> _ :: _" 40) where
 | kRep : "\<lbrakk>\<Delta> \<turnstile> e :: stringkind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (rep e) :: stringkind"
 | kNot : "\<lbrakk>\<Delta> \<turnstile> e :: stringkind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (not e) :: stringkind"
 | kLeaf : "\<lbrakk>\<Delta> \<turnstile> e :: stringkind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (leaf _ e) :: treekind"
-(* | kCapture : "\<lbrakk>\<forall> \<xi> \<in> l. \<Delta> \<turnstile> \<xi> :: treekind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (capture _ l) :: treekind"*)
+| kCapture : "\<lbrakk>\<forall> \<xi> \<in> (set l). \<Delta> \<turnstile> \<xi> :: treekind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (capture _ l) :: treekind"
+| kFoldCapMany : "\<lbrakk>\<Delta> \<turnstile> e0 :: treekind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (foldCap _ e0 _ _) :: treekind" (* Fix Me *)
+| kAbs : "\<lbrakk>\<Delta> \<turnstile> e :: stringkind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (absorb e) :: treekind"
+| kSub : "\<lbrakk>\<Delta> \<turnstile> e :: treekind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> subtree _ e :: treekind"
 
-(* but not yet *)
                 
 section{* Parsing Semantics *}
 (** parsing results *)
@@ -71,7 +73,7 @@ fun leftAssocTreeConstructor :: "string \<Rightarrow> tree \<Rightarrow> string 
 | "leftAssocTreeConstructor nu0 d0 l (thetaTl#theta) = nodeVal l ((nu0,leftAssocTreeConstructor nu0 d0 l theta)#thetaTl)"
 | "leftAssocTreeConstructor nu0 d0 l [] = baseValString ''null Subtrees Theta was given''"
 
-fun parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> string)"
+function parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> string)"
   and evalCapturedSubterm :: "(nodeExp list) \<Rightarrow> string \<Rightarrow> (subtrees \<times> string) option"
   and greedyRsTreeGene :: "nodeExp list \<Rightarrow> ((subtrees list) \<times> string) \<Rightarrow> ((subtrees list) \<times> string)"
   where
@@ -142,4 +144,11 @@ fun parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> str
                                               None \<Rightarrow> (theta,xs)
                                             | Some (thetaHd,ys) \<Rightarrow> greedyRsTreeGene xis ((thetaHd#theta),ys)
                                             )"
+
+section{* Shape Inference *}
+(* Shape *)
+datatype shape =
+  base baseTypes
+  | 
+
 end
