@@ -26,22 +26,6 @@ and  nodeExp =
 
 (* To difine well-formed CPEG Expressions, we introduce a kind system *)
 datatype cpegKind = treekind | stringkind
-
-(* Kinding Rule is defind as follows *)
-inductive kined ("_ \<turnstile> _ :: _" 40) where
-  kEmpty: "[] \<turnstile> empty :: stringkind"
-| kString: "[] \<turnstile> terminal _ :: stringkind"
-| kNt : "\<lbrakk>((nonterm e),\<kappa>)#\<Delta> \<turnstile> e :: \<kappa>\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (nonterm e) :: \<kappa>"
-| kSeq : "\<lbrakk>\<Delta> \<turnstile> e1:: stringkind; \<Delta> \<turnstile> e2 :: stringkind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (seq e1 e2) :: stringkind"
-| kAlt :  "\<lbrakk>\<Delta> \<turnstile> e1 :: \<kappa>; \<Delta> \<turnstile> e2 :: \<kappa>\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (seq e1 e2) :: \<kappa>"
-| kRep : "\<lbrakk>\<Delta> \<turnstile> e :: stringkind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (rep e) :: stringkind"
-| kNot : "\<lbrakk>\<Delta> \<turnstile> e :: stringkind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (not e) :: stringkind"
-| kLeaf : "\<lbrakk>\<Delta> \<turnstile> e :: stringkind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (leaf _ e) :: treekind"
-| kCapture : "\<lbrakk>\<forall> \<xi> \<in> (set l). \<Delta> \<turnstile> \<xi> :: treekind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (capture _ l) :: treekind"
-| kFoldCapMany : "\<lbrakk>\<Delta> \<turnstile> e0 :: treekind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (foldCap _ e0 _ _) :: treekind" (* Fix Me *)
-| kAbs : "\<lbrakk>\<Delta> \<turnstile> e :: stringkind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> (absorb e) :: treekind"
-| kSub : "\<lbrakk>\<Delta> \<turnstile> e :: treekind\<rbrakk> \<Longrightarrow> \<Delta> \<turnstile> subtree _ e :: treekind"
-
                 
 section{* Parsing Semantics *}
 (** parsing results *)
@@ -72,6 +56,12 @@ fun leftAssocTreeConstructor :: "string \<Rightarrow> tree \<Rightarrow> string 
   "leftAssocTreeConstructor nu0 d0 l (theta1#[]) = nodeVal l ((nu0,d0)#theta1)"
 | "leftAssocTreeConstructor nu0 d0 l (thetaTl#theta) = nodeVal l ((nu0,leftAssocTreeConstructor nu0 d0 l theta)#thetaTl)"
 | "leftAssocTreeConstructor nu0 d0 l [] = baseValString ''null Subtrees Theta was given''"
+
+
+export_code leftAssocTreeConstructor in Haskell module_name LeftAssocTreeConstr file Haskell
+
+
+
 
 function parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times> string)"
   and evalCapturedSubterm :: "(nodeExp list) \<Rightarrow> string \<Rightarrow> (subtrees \<times> string) option"
@@ -144,11 +134,14 @@ function parsing :: "cpegExp \<Rightarrow> string \<Rightarrow> (outputP \<times
                                               None \<Rightarrow> (theta,xs)
                                             | Some (thetaHd,ys) \<Rightarrow> greedyRsTreeGene xis ((thetaHd#theta),ys)
                                             )"
+sorry
 
-section{* Shape Inference *}
-(* Shape *)
-datatype shape =
-  base baseTypes
-  | 
+fun fparse
+  where
+"fparse a b = parsing a b"
+
+export_code fparse in Haskell
+
+
 
 end
