@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Expression.fs" />
+    <Compile Include="ShapeInference.fs" />
     <Compile Include="PEGBasedParser.fs" />
     <Compile Include="Combinator.fs" />
     <Compile Include="Program.fs" />

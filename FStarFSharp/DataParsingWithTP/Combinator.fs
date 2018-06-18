@@ -1,5 +1,6 @@
 module Combinator
 
+open Expression
 open PEGBasedParser
 
 
