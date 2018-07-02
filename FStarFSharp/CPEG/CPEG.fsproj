@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Expressions.fs" />
+    <Compile Include="RET.fs" />
+    <Compile Include="TypeInference.fs" />
+    <Compile Include="RET2ADT.fs" />
+    <Compile Include="ParsingSemantics.fs" />
+    <Compile Include="Combinator.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+</Project>
