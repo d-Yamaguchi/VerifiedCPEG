@@ -6,10 +6,10 @@
   <ItemGroup>
     <Compile Include="Expressions.fs" />
     <Compile Include="RET.fs" />
-    <Compile Include="TypeInference.fs" />
-    <Compile Include="RET2ADT.fs" />
-    <Compile Include="ParsingSemantics.fs" />
     <Compile Include="Combinator.fs" />
+    <Compile Include="TypeInference.fs" />
+    <Compile Include="ParsingSemantics.fs" />
     <Compile Include="Program.fs" />
+    
   </ItemGroup>
 </Project>

@@ -8,3 +8,4 @@ type RET =
     | RETLabel of string * RET
     | RETVar of string
     | RETErr
+    | RETLeaf of string

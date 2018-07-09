@@ -1,7 +1,6 @@
 module Combinator
 
 open Expressions
-open ParsingSemantics
 
 
 let ε = Empty

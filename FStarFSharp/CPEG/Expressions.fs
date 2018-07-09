@@ -20,3 +20,4 @@ type CPEGExp =
     | Not of e : CPEGExp
     | Cap of l : string * e : CPEGExp
     | FCap of e1: CPEGExp * l: string * e2: CPEGExp
+    | Leaf of l: string * e: string

@@ -1,7 +1,6 @@
 module ParsingSemantics
 
 open Expressions
-open System
 
 (*
 type Tree =
@@ -16,13 +15,14 @@ type Tree =
     | TConcat of vlist : Tree list
     | TEmpty
     | Fail
+    | TLeaf of l : string * str : string
 
 
 let rec parsing (se:CPEGExp) (sx:string)  = match se with
     | Empty -> (TEmpty, sx)
     | Terminal a -> match sx with
                     | "" -> (Fail, "")
-                    | _ -> if a = sx.[0..(a.Length-1)] then (TEmpty, sx.Remove 0) else (Fail, sx)
+                    | _ -> if a = sx.[0..(a.Length-1)] then (TEmpty, sx.[a.Length..sx.Length-1]) else (Fail, sx)
     | Nonterm e -> parsing e sx
     | Seq exs -> List.fold (fun v exp -> match v with
                                 | (Fail, ys) -> (Fail, ys)
@@ -56,3 +56,5 @@ let rec parsing (se:CPEGExp) (sx:string)  = match se with
                             | (v, ys) -> match parsing (Seq [e2; Rep e2]) ys with
                                             | (Fail, _) -> (v, ys)
                                             | (w, zs) -> (TNode (l,w), zs)
+    | Leaf(l, e) -> let lenE = e.Length
+                    if e = sx.[0..lenE-1] then (TLeaf(l,e), sx.[lenE..sx.Length-1]) else (Fail, sx)

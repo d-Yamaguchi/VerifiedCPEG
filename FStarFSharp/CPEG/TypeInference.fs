@@ -61,3 +61,4 @@ let rec getShape (ctx:TypingContext) = function
                           let Xa = freshName ctx.chi
                           addChi ctx Xa
                           RETVar Xa, (join E1 E2 |> Map.add Xa (RETUnion (RETLabel(l, (RETConcat [RETVar Xa; shape2])),shape1)))
+    | Leaf (l,_) -> (RETLeaf l, Map.empty)//Type checking for sigma is altavatively executed by F# type system
