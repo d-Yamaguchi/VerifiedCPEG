@@ -8,7 +8,10 @@ open ParsingSemantics
 //TEST
 let Val = Leaf ("bInt", "1")
 let Prod2 = Cap("Mul", Seq[Val;Terminal("*");Val])
-let Prod = FCap(Val,"Mul",Nonterm Val)
+let Prod = FCap(Val,"Mul",Seq[Terminal("*");Val])
+let ProdM = Rep(Val)
+let SeqREP = Rep(Seq[Terminal "a"; Val])
+let Se = Seq [Terminal "a"; Terminal "a"; Terminal "a"]
 [<EntryPoint>]
 let main argv =
     printfn "CPEG Test Varsion."
@@ -18,4 +21,11 @@ let main argv =
     printfn "==Test2: Prod type and paring result w.r.t. 1*1*1=="
     let tp = {chi=Set.empty; gamma = Map.empty} in printfn "%A" <| getShape tp Prod
     printfn "%A" <| parsing Prod "1*1*1"
+    printfn "%A" <| parsing Se "aaaaa"
+    //printfn "==Test3: Prod type and paring result w.r.t. 1*1*1=="
+    //printfn "%A" <| parsing ProdM "11111"
+    //printfn "==Test4: Prod type and paring result w.r.t. ε=="
+    //printfn "%A" <| parsing ProdM ""
+    //printfn "==Test5: Prod type and paring result w.r.t. ε=="
+    //printfn "%A" <| parsing SeqREP "a1a1a1"
     0 // return an integer exit code
